@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Allot Book - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <h1>Allot Book to Faculty</h1>
+
+    <form method="POST" class="form-container">
+        <div class="form-group">
+            <label for="book_id">Select Book:</label>
+            <select id="book_id" name="book_id" required>
+                <option value="">-- Choose a Book --</option>
+                {% for book in books %}
+                    <option value="{{ book.id }}">{{ book.title }} ({{ book.author.name }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="faculty_name">Faculty Name:</label>
+            <input type="text" id="faculty_name" name="faculty_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="faculty_phone">Faculty Phone:</label>
+            <input type="tel" id="faculty_phone" name="faculty_phone" required>
+        </div>
+
+        <div class="form-group">
+            <p class="info-text">📅 Return Period: 28 days from issue date</p>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg">Allot Book</button>
+        <a href="{{ url_for('books') }}" class="btn btn-secondary btn-lg">Cancel</a>
+    </form>
+</div>
+{% endblock %}

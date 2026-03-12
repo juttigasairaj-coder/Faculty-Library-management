@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Management - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="management-page">
+    <h1>Faculty Management</h1>
+
+    <button class="btn btn-success" onclick="openModal('addFacultyModal')">+ Add Faculty</button>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Books Taken</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in faculty.items %}
+                <tr>
+                    <td>{{ f.name }}</td>
+                    <td>{{ f.phone }}</td>
+                    <td>{{ f.email or 'N/A' }}</td>
+                    <td>{{ f.department or 'N/A' }}</td>
+                    <td>{{ f.books_taken|length }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteFaculty({{ f.id }})">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Faculty Modal -->
+    <div id="addFacultyModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('addFacultyModal')">&times;</span>
+            <h2>Add Faculty</h2>
+            <form id="addFacultyForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <input type="text" id="department" name="department">
+                </div>
+                <button type="button" class="btn btn-success" onclick="addFaculty()">Add</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addFacultyModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function addFaculty() {
+    const form = document.getElementById('addFacultyForm');
+    const data = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        department: document.getElementById('department').value
+    };
+
+    fetch('{{ url_for("add_faculty") }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(d => {
+        alert(d.message);
+        location.reload();
+    })
+    .catch(e => alert('Error: ' + e));
+}
+
+function deleteFaculty(id) {
+    if (confirm('Delete this faculty?')) {
+        fetch(`/faculty/delete/${id}`, {method: 'POST'})
+        .then(r => r.json())
+        .then(d => {
+            alert(d.message || d.error);
+            location.reload();
+        });
+    }
+}
+
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Book Management - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="management-page">
+    <h1>Book Management</h1>
+
+    <button class="btn btn-success" onclick="openModal('addBookModal')">+ Add Book</button>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books.items %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author.name }}</td>
+                    <td>{{ book.isbn or 'N/A' }}</td>
+                    <td>
+                        <span class="badge badge-{{ 'success' if book.status == 'available' else 'warning' }}">
+                            {{ book.status.upper() }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if book.status == 'available' %}
+                            <button class="btn btn-sm btn-danger" onclick="deleteBook({{ book.id }})">Delete</button>
+                        {% else %}
+                            <button class="btn btn-sm btn-secondary" disabled>Cannot Delete</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Book Modal -->
+    <div id="addBookModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('addBookModal')">&times;</span>
+            <h2>Add Book</h2>
+            <form id="addBookForm">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="author_id">Author:</label>
+                    <select id="author_id" name="author_id" required>
+                        <option value="">-- Select Author --</option>
+                        {% for author in authors %}
+                            <option value="{{ author.id }}">{{ author.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="isbn">ISBN:</label>
+                    <input type="text" id="isbn" name="isbn">
+                </div>
+                <div class="form-group">
+                    <label for="info">Info:</label>
+                    <textarea id="info" name="info"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="publication_year">Publication Year:</label>
+                    <input type="number" id="publication_year" name="publication_year">
+                </div>
+                <button type="button" class="btn btn-success" onclick="addBook()">Add</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addBookModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function addBook() {
+    const data = {
+        title: document.getElementById('title').value,
+        author_id: parseInt(document.getElementById('author_id').value),
+        isbn: document.getElementById('isbn').value,
+        info: document.getElementById('info').value,
+        publication_year: document.getElementById('publication_year').value
+    };
+
+    fetch('{{ url_for("add_book") }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(d => {
+        alert(d.message);
+        location.reload();
+    })
+    .catch(e => alert('Error: ' + e));
+}
+
+function deleteBook(id) {
+    if (confirm('Delete this book?')) {
+        fetch(`/book/delete/${id}`, {method: 'POST'})
+        .then(r => r.json())
+        .then(d => {
+            alert(d.message || d.error);
+            location.reload();
+        });
+    }
+}
+
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+</script>
+{% endblock %}

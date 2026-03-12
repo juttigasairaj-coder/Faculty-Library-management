@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Return Book - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <h1>Return Book</h1>
+
+    <div class="book-details">
+        <h2>{{ book.title }}</h2>
+        <p><strong>Author:</strong> {{ book.author.name }}</p>
+        <p><strong>Current Faculty:</strong> {{ book.current_faculty.name }}</p>
+        <p><strong>Issue Date:</strong> {{ book.issue_date.strftime('%d-%m-%Y') }}</p>
+        <p><strong>Expected Return Date:</strong> {{ book.expected_return_date.strftime('%d-%m-%Y') }}</p>
+        
+        {% if book.is_overdue() %}
+            <p style="color: red;"><strong>⚠️ Status: OVERDUE</strong></p>
+        {% endif %}
+    </div>
+
+    <form method="POST" class="form-container">
+        <p>Click the button below to confirm the return of this book.</p>
+        <button type="submit" class="btn btn-success btn-lg">Confirm Return</button>
+        <a href="{{ url_for('books') }}" class="btn btn-secondary btn-lg">Cancel</a>
+    </form>
+</div>
+{% endblock %}

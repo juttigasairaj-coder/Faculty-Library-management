@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Books - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="books-page">
+    <h1>Books Inventory</h1>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>ISBN</th>
+                    <th>Status</th>
+                    <th>Current Faculty</th>
+                    <th>Return Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books.items %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author.name }}</td>
+                    <td>{{ book.isbn or 'N/A' }}</td>
+                    <td>
+                        <span class="badge badge-{{ 'success' if book.status == 'available' else 'warning' }}">
+                            {{ book.status.upper() }}
+                        </span>
+                    </td>
+                    <td>{{ book.current_faculty.name if book.current_faculty else 'N/A' }}</td>
+                    <td>{{ book.expected_return_date.strftime('%d-%m-%Y') if book.expected_return_date else 'N/A' }}</td>
+                    <td>
+                        {% if book.status == 'taken' %}
+                            <a href="{{ url_for('return_book', book_id=book.id) }}" class="btn btn-sm btn-success">Return</a>
+                        {% else %}
+                            <a href="{{ url_for('allot_book') }}" class="btn btn-sm btn-primary">Allot</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if books.has_prev %}
+            <a href="{{ url_for('books', page=books.prev_num) }}" class="btn btn-sm">Previous</a>
+        {% endif %}
+        
+        <span class="pagination-info">Page {{ books.page }} of {{ books.pages }}</span>
+        
+        {% if books.has_next %}
+            <a href="{{ url_for('books', page=books.next_num) }}" class="btn btn-sm">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

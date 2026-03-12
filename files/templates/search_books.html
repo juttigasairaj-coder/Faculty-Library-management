@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Search Books - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <h1>Search Books</h1>
+
+    <form method="GET" class="search-form">
+        <input type="text" name="q" placeholder="Search by title or author..." value="{{ query }}" required>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if results %}
+        <h2>Search Results ({{ results|length }} found)</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in results %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.author.name }}</td>
+                        <td>{{ book.isbn or 'N/A' }}</td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if book.status == 'available' else 'warning' }}">
+                                {{ book.status.upper() }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if book.status == 'available' %}
+                                <a href="{{ url_for('allot_book') }}" class="btn btn-sm btn-primary">Allot</a>
+                            {% else %}
+                                <a href="{{ url_for('return_book', book_id=book.id) }}" class="btn btn-sm btn-success">Return</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% elif query %}
+        <div class="alert alert-info">
+            No results found for "{{ query }}"
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

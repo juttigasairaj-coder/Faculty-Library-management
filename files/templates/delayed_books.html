@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Delayed Books - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="delayed-books-page">
+    <h1>Delayed Book Returns</h1>
+
+    {% if delayed_books %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Faculty Name</th>
+                        <th>Phone</th>
+                        <th>Issue Date</th>
+                        <th>Expected Return</th>
+                        <th>Days Delayed</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in delayed_books %}
+                    <tr class="delayed-row">
+                        <td>{{ transaction.book.title }}</td>
+                        <td>{{ transaction.faculty.name }}</td>
+                        <td>{{ transaction.faculty.phone }}</td>
+                        <td>{{ transaction.issue_date.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ transaction.expected_return_date.strftime('%d-%m-%Y') }}</td>
+                        <td>
+                            {% set days = (now() - transaction.expected_return_date).days %}
+                            <span style="color: red; font-weight: bold;">{{ days }} days</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-danger">DELAYED</span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('return_book', book_id=transaction.book.id) }}" class="btn btn-sm btn-success">Return Book</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-success">
+            ✓ No delayed books! All books are returned on time.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .delayed-row {
+        background-color: #ffe6e6;
+        color: #c0392b;
+    }
+    
+    .badge-danger {
+        background-color: #e74c3c;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}

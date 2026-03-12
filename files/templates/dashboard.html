@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Dashboard</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Books</h3>
+            <p class="stat-number">{{ total_books }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Available Books</h3>
+            <p class="stat-number" style="color: #27ae60;">{{ available_books }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Books Taken</h3>
+            <p class="stat-number" style="color: #3498db;">{{ taken_books }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Delayed Returns</h3>
+            <p class="stat-number" style="color: #e74c3c;">{{ delayed_books }}</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Faculty</h3>
+            <p class="stat-number">{{ total_faculty }}</p>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+            <a href="{{ url_for('books') }}" class="btn btn-primary">View All Books</a>
+            <a href="{{ url_for('allot_book') }}" class="btn btn-success">Allot Book</a>
+            <a href="{{ url_for('delayed_books') }}" class="btn btn-warning">View Delayed Books</a>
+            <a href="{{ url_for('history') }}" class="btn btn-info">View History</a>
+            <a href="{{ url_for('faculty_list') }}" class="btn btn-secondary">Manage Faculty</a>
+            <a href="{{ url_for('book_management') }}" class="btn btn-secondary">Manage Books</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

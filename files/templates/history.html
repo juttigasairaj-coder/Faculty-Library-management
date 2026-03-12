@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}History - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="history-page">
+    <h1>Transaction History</h1>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Faculty</th>
+                    <th>Issue Date</th>
+                    <th>Expected Return</th>
+                    <th>Actual Return</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions.items %}
+                <tr>
+                    <td>{{ transaction.book.title }}</td>
+                    <td>{{ transaction.faculty.name }}</td>
+                    <td>{{ transaction.issue_date.strftime('%d-%m-%Y') }}</td>
+                    <td>{{ transaction.expected_return_date.strftime('%d-%m-%Y') }}</td>
+                    <td>{{ transaction.actual_return_date.strftime('%d-%m-%Y') if transaction.actual_return_date else 'Pending' }}</td>
+                    <td>
+                        {% if transaction.status == 'delayed' %}
+                            <span class="badge" style="background-color: #e74c3c; color: white;">DELAYED</span>
+                        {% elif transaction.status == 'returned' %}
+                            <span class="badge" style="background-color: #27ae60; color: white;">RETURNED</span>
+                        {% else %}
+                            <span class="badge" style="background-color: #3498db; color: white;">TAKEN</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if transactions.has_prev %}
+            <a href="{{ url_for('history', page=transactions.prev_num) }}" class="btn btn-sm">Previous</a>
+        {% endif %}
+        
+        <span class="pagination-info">Page {{ transactions.page }} of {{ transactions.pages }}</span>
+        
+        {% if transactions.has_next %}
+            <a href="{{ url_for('history', page=transactions.next_num) }}" class="btn btn-sm">Next</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

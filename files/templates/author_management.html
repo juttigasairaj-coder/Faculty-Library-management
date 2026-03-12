@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Author Management - Faculty Library Management{% endblock %}
+
+{% block content %}
+<div class="management-page">
+    <h1>Author Management</h1>
+
+    <button class="btn btn-success" onclick="openModal('addAuthorModal')">+ Add Author</button>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Bio</th>
+                    <th>Books</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for author in authors.items %}
+                <tr>
+                    <td>{{ author.name }}</td>
+                    <td>{{ author.bio or 'N/A' }}</td>
+                    <td>{{ author.books|length }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteAuthor({{ author.id }})">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Author Modal -->
+    <div id="addAuthorModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('addAuthorModal')">&times;</span>
+            <h2>Add Author</h2>
+            <form id="addAuthorForm">
+                <div class="form-group">
+                    <label for="author_name">Name:</label>
+                    <input type="text" id="author_name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="bio">Bio:</label>
+                    <textarea id="bio" name="bio"></textarea>
+                </div>
+                <button type="button" class="btn btn-success" onclick="addAuthor()">Add</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addAuthorModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function addAuthor() {
+    const data = {
+        name: document.getElementById('author_name').value,
+        bio: document.getElementById('bio').value
+    };
+
+    fetch('{{ url_for("add_author") }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(d => {
+        alert(d.message);
+        location.reload();
+    })
+    .catch(e => alert('Error: ' + e));
+}
+
+function deleteAuthor(id) {
+    if (confirm('Delete this author? (Books will be orphaned)')) {
+        fetch(`/author/delete/${id}`, {method: 'POST'})
+        .then(r => r.json())
+        .then(d => {
+            alert(d.message || d.error);
+            location.reload();
+        });
+    }
+}
+
+function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+</script>
+{% endblock %}
